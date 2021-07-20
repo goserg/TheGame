@@ -14,13 +14,14 @@ import (
 type Player struct {
 	animator.Animator
 	controller.Controller
+	physics.Collider
 
-	img *ebiten.Image
-	idleAnim []*ebiten.Image
+	img           *ebiten.Image
+	idleAnim      []*ebiten.Image
 	idleAnimState int
 
 	position *physics.Vector
-	speed *physics.Vector
+	speed    *physics.Vector
 	maxSpeed *physics.Vector
 }
 
@@ -36,6 +37,7 @@ func (p *Player) Update() {
 	}
 
 	p.position.Add(p.speed)
+	p.Collider.Position.Add(p.speed)
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
@@ -45,14 +47,28 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	if err != nil {
 		panic(err)
 	}
+
+	if err := p.Collider.Draw(screen); err != nil {
+		panic(err)
+	}
 }
 
 func New() (*Player, error) {
 	p := Player{
+		Collider: physics.Collider{
+			Position: physics.Vector{
+				X: 10,
+				Y: 30,
+			},
+			Size: physics.Vector{
+				X: 20,
+				Y: 30,
+			},
+		},
 		Animator: animator.New(),
 		position: &physics.Vector{},
-		speed:         &physics.Vector{},
-		maxSpeed:      &physics.Vector{
+		speed:    &physics.Vector{},
+		maxSpeed: &physics.Vector{
 			X: 4,
 			Y: 10,
 		},
